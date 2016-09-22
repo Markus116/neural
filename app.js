@@ -18,13 +18,16 @@ app.use('/data', express.static(config.get('dataPath')));
 
 var rawBodyParser = bodyParser.raw({limit: '10mb'});
 app.post("/upload/:id/:purpose",rawBodyParser, function (req, res) {
+
+    console.log("upload called",req.params.id,req.params.purpose,req.params.body);
+
     if(neuralStyleUtil.validateId(res.params.id)){
         res.status(400).send("invalid id");
         return;
     }
     neuralStyleUtil.saveImage(req.params.id, req.params.purpose, req.body, function(err) {
         if (err) {
-            res.status(500).send(err);
+            res.status(500).send("TRError " + err);
             return;
         }
         res.end();
