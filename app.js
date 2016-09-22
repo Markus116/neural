@@ -18,14 +18,16 @@ app.use('/data', express.static(config.get('dataPath')));
 
 var rawBodyParser = bodyParser.raw({limit: '10mb'});
 app.post("/upload/:id/:purpose", rawBodyParser, function (req, res) {
-    console.log("upload called " + req.params.id + " " + req.params.purpose);
+    var id = req.params.id;
+    var purpose = req.params.purpose;
+    console.log("upload called " + id + " " + purpose);
 
-    if (neuralStyleUtil.validateId(res.params.id)) {
+    if (neuralStyleUtil.validateId(id)) {
         res.status(400).send("invalid id");
         return;
     }
     console.log("saveImage called ");
-    neuralStyleUtil.saveImage(req.params.id, req.params.purpose, req.body, function (err) {
+    neuralStyleUtil.saveImage(id, purpose, req.body, function (err) {
         if (err) {
             res.status(500).send("TRError " + err);
             return;
@@ -36,23 +38,25 @@ app.post("/upload/:id/:purpose", rawBodyParser, function (req, res) {
 
 var jsonBodyParser = bodyParser.json();
 app.post('/render/:id', jsonBodyParser, function (req, res) {
-    console.log("render called", req.params.id);
-    if (!neuralStyleUtil.validateId(req.params.id)) {
+    var id = req.params.id;
+    console.log("render called", id);
+    if (!neuralStyleUtil.validateId(id)) {
         res.status(400).send('invalid id');
         return;
     }
     var settings = req.body;
-    neuralStyleRenderer.enqueueJob(req.params.id, settings);
+    neuralStyleRenderer.enqueueJob(id, settings);
     res.end();
 });
 
 app.post('/cancel/:id', function (req, res) {
-    console.log("cancel called", req.params.id);
-    if (!neuralStyleUtil.validateId(req.params.id)) {
+    var id = req.params.id;
+    console.log("cancel called", id);
+    if (!neuralStyleUtil.validateId(id)) {
         res.status(400).send('invalid id');
         return;
     }
-    neuralStyleRenderer.cancelJob(req.params.id);
+    neuralStyleRenderer.cancelJob(id);
     res.end();
 });
 
