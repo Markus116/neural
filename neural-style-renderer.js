@@ -116,6 +116,10 @@ function runRender(task, callback) {
 var workqueue = [];
 var tasks = [];
 
+queryGpus(function(gpuInfo) {
+    gpuIndexes = _.range(gpuInfo.attached_gpus[0]);
+    workqueue = async.queue(runRender, gpuInfo.attached_gpus[0]);
+});
 
 neuralStyleUtil.getExistingTasks(function (err, existingTasks) {
     if (err) {
@@ -138,6 +142,7 @@ var DEFAULT_SETTINGS = {
 };
 
 exports.enqueueJob = function (id, settings) {
+    console.log("enqueueJob " , id);
     //settings = _.defaults(settings, DEFAULT_SETTINGS);
     settings = DEFAULT_SETTINGS;
     async.parallel([
@@ -157,13 +162,14 @@ exports.enqueueJob = function (id, settings) {
             'contentPath': results[1],
             'stylePath': results[2],
             'settings': settings,
-            'iter': 0,
+            'iter': 0
         };
         tasks.unshift(task);
         if (err) {
             util.log(err);
             task.state = neuralStyleUtil.FAILED;
         } else {
+            console.log("push task");
             workqueue.push(task);
         }
         sendTaskStatusEvent(task);
