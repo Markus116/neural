@@ -22,7 +22,7 @@ app.post("/upload/:id/:purpose", rawBodyParser, function (req, res) {
     var purpose = req.params.purpose;
     console.log("upload called " + id + " " + purpose);
 
-    if (neuralStyleUtil.validateId(id)) {
+    if (!neuralStyleUtil.validateId(id)) {
         res.status(400).send("invalid id");
         return;
     }
