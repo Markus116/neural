@@ -186,18 +186,7 @@ exports.getTaskStatuses = function() {
 
 exports.getStatus = function(callback) {
     queryGpus(function(gpuInfo) {
-        var status = {
-            'queuedTasks': workqueue.length()
-            //,'gpus': [],
-        };
-       /* _.each(gpuInfo.gpu, function(gpu) {
-            status.gpus.push({
-                'utilization': gpu.utilization[0].gpu_util[0],
-                'temperature': gpu.temperature[0].gpu_temp[0],
-                'power': gpu.power_readings[0].power_draw[0],
-            });
-        });*/
-        callback(status);
+        callback({});
     });
 }
 
@@ -207,7 +196,6 @@ function sendStatusEvent() {
         exports.eventEmitter.emit('status', status);
     });
 }
-//setInterval(sendStatusEvent, 5000);
 function sendTaskStatusEvent(task) {
     exports.eventEmitter.emit('render', getTaskStatus(task));
 }

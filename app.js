@@ -33,6 +33,7 @@ app.post("/upload/:id/:purpose",rawBodyParser, function (req, res) {
 
 var jsonBodyParser = bodyParser.json();
 app.post('/render/:id', jsonBodyParser, function(req, res) {
+    console.log("render called",req.params.id);
     if (!neuralStyleUtil.validateId(req.params.id)) {
         res.status(400).send('invalid id');
         return;
@@ -43,6 +44,7 @@ app.post('/render/:id', jsonBodyParser, function(req, res) {
 });
 
 app.post('/cancel/:id', function(req, res) {
+    console.log("cancel called",req.params.id);
     if (!neuralStyleUtil.validateId(req.params.id)) {
         res.status(400).send('invalid id');
         return;
@@ -53,6 +55,7 @@ app.post('/cancel/:id', function(req, res) {
 
 var updateSockets = [];
 app.ws('/updates', function (ws, req) {
+    console.log("updates called");
     updateSockets.push(ws);
     ws.on('close', function () {
         var index = updateSockets.indexOf(ws);
