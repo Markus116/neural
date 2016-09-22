@@ -11,6 +11,11 @@ var xml2js = require('xml2js');
 
 var NUM_PROGRESS_IMAGES = 10;
 
+function queryGpus(callback) {
+    return callback({});
+}
+exports.queryGpus = queryGpus;
+
 function getTaskStatus(task) {
     var status = {
         'id': task.id,
@@ -182,16 +187,16 @@ exports.getTaskStatuses = function() {
 exports.getStatus = function(callback) {
     queryGpus(function(gpuInfo) {
         var status = {
-            'queuedTasks': workqueue.length(),
-            'gpus': [],
+            'queuedTasks': workqueue.length()
+            //,'gpus': [],
         };
-        _.each(gpuInfo.gpu, function(gpu) {
+       /* _.each(gpuInfo.gpu, function(gpu) {
             status.gpus.push({
                 'utilization': gpu.utilization[0].gpu_util[0],
                 'temperature': gpu.temperature[0].gpu_temp[0],
                 'power': gpu.power_readings[0].power_draw[0],
             });
-        });
+        });*/
         callback(status);
     });
 }
