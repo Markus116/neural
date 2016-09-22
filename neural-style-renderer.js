@@ -86,6 +86,7 @@ function runRender(task, callback) {
     var stdout = '';
     var lastIter = 0;
     neuralStyle.stdout.on('data', function (data) {
+        console.log("stdout", data);
         stdout += String(data);
         task.iter = getLatestIteration(stdout);
         if (task.iter > lastIter) {
