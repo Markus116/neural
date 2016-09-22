@@ -117,8 +117,8 @@ var workqueue = [];
 var tasks = [];
 
 queryGpus(function(gpuInfo) {
-    gpuIndexes = _.range(gpuInfo.attached_gpus[0]);
-    workqueue = async.queue(runRender, gpuInfo.attached_gpus[0]);
+    /*gpuIndexes = _.range(gpuInfo.attached_gpus[0]);
+    workqueue = async.queue(runRender, gpuInfo.attached_gpus[0]);*/
 });
 
 neuralStyleUtil.getExistingTasks(function (err, existingTasks) {
