@@ -7,6 +7,7 @@ var path = require('path');
 
 
 try {
+    console.log("dataPath " + config.get('dataPath'));
     fs.mkdirSync(config.get('dataPath'));
 } catch (ex) {
     if (ex.code != 'EEXIST') {
