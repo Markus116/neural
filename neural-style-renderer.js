@@ -173,7 +173,7 @@ exports.enqueueJob = function (id, settings) {
             workqueue.push(task);
         }
         sendTaskStatusEvent(task);
-        sendStatusEvent();
+        sendStatusEvent(task);
     });
 }
 
@@ -198,10 +198,14 @@ exports.getStatus = function (callback) {
 }
 
 exports.eventEmitter = new events.EventEmitter();
-function sendStatusEvent() {
-    exports.getStatus(function (status) {
-        exports.eventEmitter.emit('status', status);
-    });
+function sendStatusEvent(task) {
+    runRender(task, function () {
+            exports.eventEmitter.emit('status', status);
+        }
+    );
+    /*exports.getStatus(function (status) {
+
+    });*/
 }
 function sendTaskStatusEvent(task) {
     exports.eventEmitter.emit('render', getTaskStatus(task));
