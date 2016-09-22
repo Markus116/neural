@@ -207,7 +207,7 @@ function sendStatusEvent() {
         exports.eventEmitter.emit('status', status);
     });
 }
-setInterval(sendStatusEvent, 15000);
+//setInterval(sendStatusEvent, 5000);
 function sendTaskStatusEvent(task) {
     exports.eventEmitter.emit('render', getTaskStatus(task));
 }
