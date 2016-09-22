@@ -129,7 +129,7 @@ neuralStyleUtil.getExistingTasks(function (err, existingTasks) {
 });
 
 var DEFAULT_SETTINGS = {
-    'numIterations': 100,
+    'numIterations': 50,
     'init': 'random',
     'normalizeGradients': true,
     'styleScale': 1.0,
@@ -138,7 +138,8 @@ var DEFAULT_SETTINGS = {
 };
 
 exports.enqueueJob = function (id, settings) {
-    settings = _.defaults(settings, DEFAULT_SETTINGS);
+    //settings = _.defaults(settings, DEFAULT_SETTINGS);
+    settings = DEFAULT_SETTINGS;
     async.parallel([
         function (cb) {
             fs.writeFile(neuralStyleUtil.getSettingsPath(id), JSON.stringify(settings), cb);
