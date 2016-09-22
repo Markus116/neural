@@ -1,6 +1,6 @@
 {
   "port": 3030,
-  "dataPath": "/home/neural/",
+  "dataPath": "/home/yura/neural/",
   "neuralStylePath": "/home/yura/neural-style/",
   "username": "user",
   "password": "password"
