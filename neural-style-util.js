@@ -101,6 +101,7 @@ exports.getImagePathPrefix = function(id, purpose) {
 
 exports.saveImage = function(id, purpose, data, callback) {
     var outputPath = exports.getImagePathPrefix(id, purpose);
+    console.log("save image",outputPath);
     async.waterfall([
         function(cb) {
             fs.writeFile(outputPath, data, cb);
