@@ -113,7 +113,7 @@ function runRender(task, callback) {
     });
 }
 
-var workqueue;
+var workqueue = [];
 var tasks = [];
 
 
