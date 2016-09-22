@@ -17,15 +17,15 @@ app.use('/bower_components', express.static(__dirname + '/bower_components'));
 app.use('/data', express.static(config.get('dataPath')));
 
 var rawBodyParser = bodyParser.raw({limit: '10mb'});
-app.post("/upload/:id/:purpose",rawBodyParser, function (req, res) {
+app.post("/upload/:id/:purpose", rawBodyParser, function (req, res) {
+    console.log("upload called " + req.params.id + " " + req.params.purpose);
 
-    console.log("upload called",req.params.id,req.params.purpose,req.params.body);
-
-    if(neuralStyleUtil.validateId(res.params.id)){
+    if (neuralStyleUtil.validateId(res.params.id)) {
         res.status(400).send("invalid id");
         return;
     }
-    neuralStyleUtil.saveImage(req.params.id, req.params.purpose, req.body, function(err) {
+    console.log("saveImage called ");
+    neuralStyleUtil.saveImage(req.params.id, req.params.purpose, req.body, function (err) {
         if (err) {
             res.status(500).send("TRError " + err);
             return;
@@ -35,8 +35,8 @@ app.post("/upload/:id/:purpose",rawBodyParser, function (req, res) {
 });
 
 var jsonBodyParser = bodyParser.json();
-app.post('/render/:id', jsonBodyParser, function(req, res) {
-    console.log("render called",req.params.id);
+app.post('/render/:id', jsonBodyParser, function (req, res) {
+    console.log("render called", req.params.id);
     if (!neuralStyleUtil.validateId(req.params.id)) {
         res.status(400).send('invalid id');
         return;
@@ -46,8 +46,8 @@ app.post('/render/:id', jsonBodyParser, function(req, res) {
     res.end();
 });
 
-app.post('/cancel/:id', function(req, res) {
-    console.log("cancel called",req.params.id);
+app.post('/cancel/:id', function (req, res) {
+    console.log("cancel called", req.params.id);
     if (!neuralStyleUtil.validateId(req.params.id)) {
         res.status(400).send('invalid id');
         return;
@@ -65,7 +65,7 @@ app.ws('/updates', function (ws, req) {
         updateSockets.splice(index, 1);
     });
 
-    process.nextTick(function() {
+    process.nextTick(function () {
         if (_.findIndex(updateSockets, ws) == -1) {
             return;
         }

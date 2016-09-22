@@ -94,6 +94,7 @@ exports.getSettingsPath = function(id) {
 }
 
 exports.getImagePathPrefix = function(id, purpose) {
+    console.log("getImagePathPrefix", id, purpose);
     return path.join(
         config.get('dataPath'),
         id + '_' + purpose);

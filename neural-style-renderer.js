@@ -85,7 +85,7 @@ function runRender(task, callback) {
 
     var stdout = '';
     var lastIter = 0;
-    neuralStyle.stdout.on('data', function(data) {
+    neuralStyle.stdout.on('data', function (data) {
         stdout += String(data);
         task.iter = getLatestIteration(stdout);
         if (task.iter > lastIter) {
@@ -97,7 +97,7 @@ function runRender(task, callback) {
         }
     });
 
-    neuralStyle.on('exit', function(code) {
+    neuralStyle.on('exit', function (code) {
         if (code != 0) {
             util.log('neural_style failed for id ' + task.id + ' with code ' + code + '\n' + neuralStyle.stderr.read());
             if (task.state != neuralStyleUtil.CANCELLED) {
@@ -117,13 +117,13 @@ var workqueue = [];
 var tasks = [];
 
 
-neuralStyleUtil.getExistingTasks(function(err, existingTasks) {
+neuralStyleUtil.getExistingTasks(function (err, existingTasks) {
     if (err) {
         util.log('Failed to find existing tasks: ' + err);
         return;
     }
     tasks = tasks.concat(existingTasks);
-    _.each(existingTasks, function(task) {
+    _.each(existingTasks, function (task) {
         sendTaskStatusEvent(task);
     });
 });
@@ -137,19 +137,19 @@ var DEFAULT_SETTINGS = {
     'learningRate': 10.0
 };
 
-exports.enqueueJob = function(id, settings) {
+exports.enqueueJob = function (id, settings) {
     settings = _.defaults(settings, DEFAULT_SETTINGS);
     async.parallel([
-        function(cb) {
+        function (cb) {
             fs.writeFile(neuralStyleUtil.getSettingsPath(id), JSON.stringify(settings), cb);
         },
-        function(cb) {
+        function (cb) {
             neuralStyleUtil.findImagePath(id, neuralStyleUtil.CONTENT, cb);
         },
-        function(cb) {
+        function (cb) {
             neuralStyleUtil.findImagePath(id, neuralStyleUtil.STYLE, cb);
         },
-    ], function(err, results) {
+    ], function (err, results) {
         var task = {
             'id': id,
             'state': neuralStyleUtil.QUEUED,
@@ -170,8 +170,8 @@ exports.enqueueJob = function(id, settings) {
     });
 }
 
-exports.cancelJob = function(id) {
-    _.each(tasks, function(task) {
+exports.cancelJob = function (id) {
+    _.each(tasks, function (task) {
         if (task.id == id &&
             (task.state == neuralStyleUtil.QUEUED || task.state == neuralStyleUtil.RUNNING)) {
             task.state = neuralStyleUtil.CANCELLED;
@@ -180,19 +180,19 @@ exports.cancelJob = function(id) {
     });
 }
 
-exports.getTaskStatuses = function() {
+exports.getTaskStatuses = function () {
     return _.map(tasks, getTaskStatus);
 }
 
-exports.getStatus = function(callback) {
-    queryGpus(function(gpuInfo) {
+exports.getStatus = function (callback) {
+    queryGpus(function (gpuInfo) {
         callback({});
     });
 }
 
 exports.eventEmitter = new events.EventEmitter();
 function sendStatusEvent() {
-    exports.getStatus(function(status) {
+    exports.getStatus(function (status) {
         exports.eventEmitter.emit('status', status);
     });
 }
