@@ -42,7 +42,7 @@ exports.getExistingTasks = function(callback) {
             if (!_.has(idToTask, id)) {
                 idToTask[id] = {
                     'id': id,
-                    'state': exports.FAILED,
+                    'state': exports.FAILED
                 };
             }
             var task = idToTask[id];

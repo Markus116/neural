@@ -1,0 +1,154 @@
+<link rel="import" href="bower_components/polymer/polymer.html">
+
+<link rel="import" href="bower_components/iron-image/iron-image.html">
+<link rel="import" href="bower_components/paper-button/paper-button.html">
+<link rel="import" href="bower_components/paper-card/paper-card.html">
+<link rel="import" href="bower_components/paper-slider/paper-slider.html">
+
+<link rel="import" href="render-settings.html">
+
+<dom-module id="output-card">
+  <template>
+    <style>
+      .output-card-content {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+      }
+
+      .source-images-column {
+        margin: 16px;
+        display: flex;
+        flex-direction: column;
+      }
+
+      .source-image {
+        width: 192px;
+        height: 192px;
+        border: 1px solid #666;
+        margin-top: 8px;
+        margin-bottom: 8px;
+      }
+
+      .output-column {
+        margin: 16px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+      }
+
+      .action-buttons {
+        display: flex;
+        flex-direction: row;
+      }
+    </style>
+    <paper-card>
+      <div class="output-card-content">
+        <div class="source-images-column">
+          <iron-image class="source-image" sizing="contain" src="{{ status.contentUrl }}">
+          </iron-image>
+          <iron-image class="source-image" sizing="contain" src="{{ status.styleUrl }}">
+          </iron-image>
+        </div>
+        <div class="output-column">
+          <div>{{ status.state }}</div>
+          <div>
+            <span>{{ status.iter }}</span>
+            /
+            <span>{{ status.settings.numIterations }}</span>
+          </div>
+          <iron-image src="{{ outputUrl }}"></iron-image>
+          <paper-slider
+             min="0"
+             max="{{ outputUrlIndexMax_ }}"
+             value="{{ outputUrlIndex_ }}">
+          </paper-slider>
+        </div>
+        <render-settings disabled="true" settings="{{ status.settings }}"></render-settings>
+      </div>
+      <div class="card-actions">
+        <div class="action-buttons">
+          <paper-button
+             disabled="{{ cancelButtonDisabled_ }}"
+             on-tap="cancel_">
+            Cancel
+          </paper-button>
+          <paper-button
+             on-tap="copyToNewImage_">
+            Copy to New Image
+          </paper-button>
+        </div>
+      </div>
+    </paper-card>
+  </template>
+  <script src="underscore-min.js"></script>
+  <script>
+    (function() {
+      'use strict';
+      Polymer({
+        is: 'output-card',
+        properties: {
+          status: {
+            type: Object,
+            value: null,
+            observer: 'statusChanged_',
+          },
+          outputUrlIndex_: {
+            type: Number,
+            value: 0,
+          },
+          outputUrlIndexMax_: {
+            type: Number,
+            value: 0,
+          },
+          outputUrl: {
+            type: String,
+            computed: 'makeOutputUrl_(status.outputUrls, outputUrlIndex_)',
+          },
+          cancelButtonDisabled_: {
+            type: Boolean,
+            computed: 'makeCancelButtonDisabled_(status.state)',
+          },
+        },
+        statusChanged_: function(newStatus, oldStatus) {
+          if (!newStatus) {
+            return;
+          }
+          if (!oldStatus || newStatus.id != oldStatus.id) {
+            this.set('outputUrlIndexMax_', newStatus.outputUrls.length - 1);
+            this.set('outputUrlIndex_', newStatus.outputUrls.length - 1);
+          } else if (newStatus.outputUrls.length != oldStatus.outputUrls.length) {
+            this.set('outputUrlIndexMax_', newStatus.outputUrls.length - 1);
+            if (this.outputUrlIndex_ == oldStatus.outputUrls.length - 1) {
+              this.set('outputUrlIndex_', newStatus.outputUrls.length - 1);
+            }
+          }
+        },
+        makeOutputUrl_: function(outputUrls, outputUrlIndex) {
+          if (!outputUrls || outputUrls.length == 0) {
+            return '';
+          }
+          return outputUrls[outputUrlIndex];
+        },
+        makeCancelButtonDisabled_: function(state) {
+          return state != 'queued' && state != 'running';
+        },
+        cancel_: function() {
+          var xhr = new XMLHttpRequest();
+          xhr.open('POST', '/cancel/' + this.status.id);
+          xhr.send();
+        },
+        copyToNewImage_: function() {
+          var settings = _.clone(this.status.settings);
+          settings.contentLayers = _.clone(this.status.settings.contentLayers);
+          settings.styleLayers = _.clone(this.status.settings.styleLayers);
+          this.fire('copyToNewImage', {
+            'settings': settings,
+            'contentUrl': this.status.contentUrl,
+            'styleUrl': this.status.styleUrl,
+          });
+        },
+      });
+    })();
+  </script>
+</dom-module>

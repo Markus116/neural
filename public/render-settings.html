@@ -1,0 +1,184 @@
+<link rel="import" href="bower_components/polymer/polymer.html">
+
+<link rel="import" href="bower_components/paper-checkbox/paper-checkbox.html">
+<link rel="import" href="bower_components/paper-dropdown-menu/paper-dropdown-menu.html">
+<link rel="import" href="bower_components/paper-item/paper-item.html">
+<link rel="import" href="bower_components/paper-listbox/paper-listbox.html">
+
+<link rel="import" href="labeled-log-slider.html">
+<link rel="import" href="layer-picker.html">
+
+<dom-module id="render-settings">
+  <template>
+    <style>
+      .settings-columns {
+        display: flex;
+        flex-direction: row;
+      }
+
+      .settings-column {
+        display: flex;
+        flex-direction: column;
+        width: 160px;
+        margin-right: 8px;
+      }
+
+      labeled-log-slider {
+        padding-top: 8px;
+        padding-bottom: 6px;
+      }
+
+      layer-picker {
+        padding-top: 8px;
+        padding-bottom: 6px;
+      }
+
+      .normalize-gradients {
+        font-size: 12px;
+      }
+    </style>
+    <div class="settings-columns">
+      <div class="settings-column">
+        <paper-dropdown-menu label="Output Image Size" disabled="{{ disabled }}">
+          <paper-listbox class="dropdown-content" attr-for-selected="data-value" selected="{{ settings.imageSize }}">
+            <paper-item data-value="128">128px</paper-item>
+            <paper-item data-value="256">256px</paper-item>
+            <paper-item data-value="384">384px</paper-item>
+            <paper-item data-value="512">512px</paper-item>
+            <paper-item data-value="768">768px</paper-item>
+          </paper-listbox>
+        </paper-dropdown-menu>
+        <paper-dropdown-menu label="Number of Iterations" disabled="{{ disabled }}">
+          <paper-listbox class="dropdown-content" attr-for-selected="data-value" selected="{{ settings.numIterations }}">
+            <paper-item data-value="500">500</paper-item>
+            <paper-item data-value="750">750</paper-item>
+            <paper-item data-value="1000">1000</paper-item>
+            <paper-item data-value="1250">1250</paper-item>
+            <paper-item data-value="1500">1500</paper-item>
+            <paper-item data-value="2000">2000</paper-item>
+          </paper-listbox>
+        </paper-dropdown-menu>
+        <paper-dropdown-menu label="Initial Image" disabled="{{ disabled }}">
+          <paper-listbox class="dropdown-content" attr-for-selected="data-value" selected="{{ settings.init }}">
+            <paper-item data-value="random">random</paper-item>
+            <paper-item data-value="image">content image</paper-item>
+          </paper-listbox>
+        </paper-dropdown-menu>
+        <paper-dropdown-menu label="Pooling" disabled="{{ disabled }}">
+          <paper-listbox class="dropdown-content" attr-for-selected="data-value" selected="{{ settings.pooling }}">
+            <paper-item data-value="avg">average</paper-item>
+            <paper-item data-value="max">max</paper-item>
+          </paper-listbox>
+        </paper-dropdown-menu>
+        <paper-dropdown-menu label="Optimizer" disabled="{{ disabled }}">
+          <paper-listbox class="dropdown-content" attr-for-selected="data-value" selected="{{ settings.optimizer }}">
+            <paper-item data-value="adam">ADAM</paper-item>
+            <paper-item data-value="lbfgs">L-BFGS</paper-item>
+          </paper-listbox>
+        </paper-dropdown-menu>
+        <labeled-log-slider
+           label="Learning Rate"
+           value="{{ settings.learningRate }}"
+           min="1"
+           max="20"
+           disabled="{{ disabled }}">
+        </labeled-log-slider>
+        <layer-picker
+           label="Content Layers"
+           layers="{{ settings.contentLayers }}"
+           disabled="{{ disabled }}">
+        </layer-picker>
+        <paper-checkbox class="normalize-gradients" checked="{{ settings.normalizeGradients }}" disabled="{{ disabled }}">
+          Normalize Gradients
+        </paper-checkbox>
+      </div>
+      <div class="settings-column">
+        <labeled-log-slider
+           label="Content Weight"
+           value="{{ settings.contentWeight }}"
+           min="0.001"
+           max="100"
+           disabled="{{ disabled }}">
+        </labeled-log-slider>
+        <labeled-log-slider
+           label="Style Weight"
+           value="{{ settings.styleWeight }}"
+           min="0.001"
+           max="100"
+           disabled="{{ disabled }}">
+        </labeled-log-slider>
+        <labeled-log-slider
+           label="Style Scale"
+           value="{{ settings.styleScale }}"
+           min="0.1"
+           max="10"
+           disabled="{{ disabled }}">
+        </labeled-log-slider>
+        <labeled-log-slider
+           label="TV Regularization Weight"
+           value="{{ settings.tvWeight }}"
+           min="0.0001"
+           max="1"
+           disabled="{{ disabled }}">
+        </labeled-log-slider>
+        <layer-picker
+           label="Style Layers"
+           layers="{{ settings.styleLayers }}"
+           disabled="{{ disabled }}">
+        </layer-picker>
+      </div>
+    </div>
+  </template>
+  <script>
+    function makeDefaultSettings() {
+      return {
+        'imageSize': 256,
+        'numIterations': 1000,
+        'contentWeight': 5,
+        'styleWeight': 100,
+        'tvWeight': 0.001,
+        'init': 'random',
+        'normalizeGradients': false,
+        'contentLayers': ['relu4_2'],
+        'styleLayers': ['relu1_1', 'relu2_1', 'relu3_1', 'relu4_1', 'relu5_1'],
+        'styleScale': 1.0,
+        'pooling': 'max',
+        'optimizer': 'adam',
+        'learningRate': 10.0,
+      };
+    }
+
+    (function() {
+      'use strict';
+      Polymer({
+        is: 'render-settings',
+        properties: {
+          disabled: {
+            type: Boolean,
+            value: false,
+          },
+          settings: {
+            type: Object,
+            value: makeDefaultSettings,
+          },
+        },
+        observers: [
+          'settingsChanged_(settings.*)'
+        ],
+        reset: function() {
+          this.set('settings', makeDefaultSettings());
+        },
+        settingsChanged_: function(changeRecord) {
+          var fixNumericSetting = function(name) {
+            if (typeof(this.settings[name]) == 'string') {
+              this.settings[name] = Number(this.settings[name]);
+              this.notifyPath('settings.' + name, this.settings[name]);
+            }
+          }.bind(this);
+          fixNumericSetting('imageSize');
+          fixNumericSetting('numIterations');
+        },
+      });
+    })();
+  </script>
+</dom-module>

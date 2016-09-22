@@ -1,0 +1,23 @@
+{
+  "name": "neural",
+  "version": "1.0.0",
+  "homepage": "https://github.com/Markus116/neural.git",
+  "authors": [
+    "Trembit"
+  ],
+  "description": "A web server frontend for https://github.com/Markus116/neural.git",
+  "main": "app.js",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "polymer": "Polymer/polymer#^1.2.0",
+    "iron-elements": "PolymerElements/iron-elements#~1.0.4",
+    "paper-elements": "PolymerElements/paper-elements#~1.0.6"
+  }
+}
