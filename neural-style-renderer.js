@@ -109,7 +109,7 @@ function runRender(task, callback) {
             task.state = neuralStyleUtil.DONE;
         }
         sendTaskStatusEvent(task);
-        sendStatusEvent();
+        sendStatusEvent(task);
         callback();
     });
 }
@@ -134,12 +134,8 @@ neuralStyleUtil.getExistingTasks(function (err, existingTasks) {
 });
 
 var DEFAULT_SETTINGS = {
-    'numIterations': 50,
-    'init': 'random',
-    'normalizeGradients': true,
-    'styleScale': 1.0,
+    'numIterations': 10,
     'optimizer': 'adam',
-    'learningRate': 10.0
 };
 
 exports.enqueueJob = function (id, settings) {
