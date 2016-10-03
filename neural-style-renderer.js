@@ -8,7 +8,7 @@ var childProcess = require('child_process');
 var neuralStyleUtil = require('./neural-style-utils');
 
 var NUM_PROGRESS_IMAGES = 10;
-var TOTAL_ITER_NUM = 10;
+var TOTAL_ITER_NUM = 100;
 
 function getTaskStatus(task) {
     console.log("getTaskStatus",task.id);
@@ -47,7 +47,7 @@ function runRender(task, callback) {
         '-gpu', task.settings.gpu,
         '-num_iterations', task.settings.numIterations,
         '-output_image', outputPath + '.png',
-        '-print_iter', 1
+        '-print_iter', 10
     ];
 
     if (task.settings.normalizeGradients) {
@@ -111,7 +111,7 @@ var tasks = [];
 var DEFAULT_SETTINGS = {
     'normalizeGradients': false,
     'optimizer': 'adam',
-    'numIterations':10,
+    'numIterations':TOTAL_ITER_NUM,
     'gpu':-1
 };
 
