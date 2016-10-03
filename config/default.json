@@ -1,7 +1,7 @@
 {
   "port": 3030,
-  "dataPath": "/home/yura/neural/images/",
-  "neuralStylePath": "/home/yura/neural-style/",
+  "dataPath": "/home/trembit/neural/images/",
+  "neuralStylePath": "/home/trembit/neural-style/",
   "username": "user",
   "password": "password"
 }
