@@ -5,16 +5,32 @@ var config = require('config');
 var express = require('express');
 var expressWs = require('express-ws');
 var morgan = require('morgan');
+var cors = require('cors');
+
+var neuralStyleUtil = require('./neural-style-utils');
 var neuralStyleRenderer = require('./neural-style-renderer');
-var neuralStyleUtil = require('./neural-style-util');
+
 
 var app = express();
 expressWs(app);
 app.use(morgan('short'));
+app.use('/images',express.static('images'));
+app.use(cors());
 
-app.use(express.static('public'));
-app.use('/bower_components', express.static(__dirname + '/bower_components'));
-app.use('/data', express.static(config.get('dataPath')));
+var updateSockets = [];
+//var socketsMap = {};
+
+app.ws('/updates', function (ws, req) {
+    //var id = req.params.id;
+    updateSockets.push(ws);
+    //socketsMap[id] = ws;
+    console.log("updates called - new connection, " + updateSockets.length);
+    ws.on('close', function () {
+        var index = updateSockets.indexOf(ws);
+        updateSockets.splice(index, 1);
+        //delete socketsMap[id];
+    });
+});
 
 var rawBodyParser = bodyParser.raw({limit: '10mb'});
 app.post("/upload/:id/:purpose", rawBodyParser, function (req, res) {
@@ -37,61 +53,31 @@ app.post("/upload/:id/:purpose", rawBodyParser, function (req, res) {
 });
 
 var jsonBodyParser = bodyParser.json();
-app.post('/render/:id', jsonBodyParser, function (req, res) {
+app.post('/render/:id',jsonBodyParser,function(req, res){
     var id = req.params.id;
-    console.log("render called", id);
-    if (!neuralStyleUtil.validateId(id)) {
+    console.log("start called");
+
+    if (!neuralStyleUtil.validateId(req.params.id)) {
         res.status(400).send('invalid id');
         return;
     }
     var settings = req.body;
-    neuralStyleRenderer.enqueueJob(id, settings);
+    neuralStyleRenderer.enqueueJob(req.params.id, settings);
     res.end();
 });
 
-app.post('/cancel/:id', function (req, res) {
-    var id = req.params.id;
-    console.log("cancel called", id);
-    if (!neuralStyleUtil.validateId(id)) {
-        res.status(400).send('invalid id');
-        return;
-    }
-    neuralStyleRenderer.cancelJob(id);
-    res.end();
-});
-
-var updateSockets = [];
-app.ws('/updates', function (ws, req) {
-    console.log("updates called");
-    updateSockets.push(ws);
-    ws.on('close', function () {
-        var index = updateSockets.indexOf(ws);
-        updateSockets.splice(index, 1);
-    });
-
-    process.nextTick(function () {
-        if (_.findIndex(updateSockets, ws) == -1) {
-            return;
-        }
-        var taskStatuses = neuralStyleRenderer.getTaskStatuses();
-        for (var i = taskStatuses.length - 1; i >= 0; i--) {
-            ws.send(JSON.stringify({'type': 'render', 'data': taskStatuses[i]}));
-        }
-    });
-});
-
-function broadcastUpdate(type, data) {
+function broadcastUpdates(type, data) {
     _.each(updateSockets, function (ws) {
         ws.send(JSON.stringify({'type': type, 'data': data}));
     });
 }
 
-neuralStyleRenderer.eventEmitter.on('render', function (taskStatus) {
-    broadcastUpdate('render', taskStatus);
-});
+function broadcastUpdate(ws,type, data){
+    ws.send(JSON.stringify({'type': type, 'data': data}));
+}
 
-neuralStyleRenderer.eventEmitter.on('status', function (status) {
-    broadcastUpdate('status', status);
+neuralStyleRenderer.eventEmitter.on('render', function(taskStatus) {
+    broadcastUpdates('render', taskStatus);
 });
 
 var server = app.listen(config.get('port'), function () {
