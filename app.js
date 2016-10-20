@@ -49,17 +49,16 @@ app.post("/upload/:id", rawBodyParser, function (req, res) {
 });
 
 var jsonBodyParser = bodyParser.json();
-app.post('/render/:id',jsonBodyParser,function(req, res){
+app.post('/render/:id/:modelId',jsonBodyParser,function(req, res){
     var id = req.params.id;
+    var modelId = req.params.modelId;
     console.log("start called");
 
     if (!neuralStyleUtil.validateId(req.params.id)) {
         res.status(400).send('invalid id');
         return;
     }
-    var settings = req.body;
-    console.log("settings", req.body);
-    neuralStyleRenderer.enqueueJob(req.params.id, settings);
+    neuralStyleRenderer.enqueueJob(req.params.id, {'modelId':modelId});
     res.end();
 });
 
