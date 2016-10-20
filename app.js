@@ -58,6 +58,7 @@ app.post('/render/:id',jsonBodyParser,function(req, res){
         return;
     }
     var settings = req.body;
+    console.log("settings", settings);
     neuralStyleRenderer.enqueueJob(req.params.id, settings);
     res.end();
 });
