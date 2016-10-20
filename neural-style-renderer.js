@@ -14,7 +14,7 @@ var models = [
     "models/eccv16/la_muse.t7",
     "models/instance_norm/mosaic.t7",
     "models/eccv16/starry_night.t7",
-    "models/cd ,,/the_scream.t7",
+    "models/instance_norm/the_scream.t7",
     "models/instance_norm/udnie.t7",
     "models/eccv16/the_wave.t7"
 ];
