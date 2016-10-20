@@ -38,7 +38,10 @@ function getTaskStatus(task) {
 }
 
 function getModelPathById(id){
-    return path.join(config.get('neuralStylePath'),models[id-1]);
+    var modelId = Number(id);
+    console.log("modelId = " + modelId);
+    //return path.join(config.get('neuralStylePath'),models[modelId-1]);
+    return path.join(config.get('neuralStylePath'),"models/instance_norm/candy.t7");
 }
 
 function runRender(task, callback) {
