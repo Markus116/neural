@@ -14,7 +14,7 @@ var models = [
     "models/eccv16/la_muse.t7",
     "models/instance_norm/mosaic.t7",
     "models/eccv16/starry_night.t7",
-    "models/instance_norm/the_scream.t7",
+    "models/cd ,,/the_scream.t7",
     "models/instance_norm/udnie.t7",
     "models/eccv16/the_wave.t7"
 ];
@@ -51,9 +51,11 @@ function runRender(task, callback) {
     sendTaskStatusEvent(task);
 
     var outputPath = neuralStyleUtil.getImagePathPrefix(task.id, neuralStyleUtil.OUTPUT);
+    var modelPath = path.join(config.get('neuralStylePath'),task.modelPath);
+    console.log("modelpath:",task.modelPath,modelPath);
     var params = [
         path.join(config.get('neuralStylePath'), 'fast_neural_style.lua'),
-        '-model',path.join(config.get('neuralStylePath'),task.modelPath),
+        '-model',modelPath,
         '-input_image', task.contentPath,
         '-output_image', outputPath + '.png',
         '-gpu', task.settings.gpu
