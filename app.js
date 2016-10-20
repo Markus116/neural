@@ -18,24 +18,20 @@ app.use('/images',express.static('images'));
 app.use(cors());
 
 var updateSockets = [];
-//var socketsMap = {};
 
 app.ws('/updates', function (ws, req) {
-    //var id = req.params.id;
     updateSockets.push(ws);
-    //socketsMap[id] = ws;
     console.log("updates called - new connection, " + updateSockets.length);
     ws.on('close', function () {
         var index = updateSockets.indexOf(ws);
         updateSockets.splice(index, 1);
-        //delete socketsMap[id];
     });
 });
 
 var rawBodyParser = bodyParser.raw({limit: '10mb'});
-app.post("/upload/:id/:purpose", rawBodyParser, function (req, res) {
+app.post("/upload/:id", rawBodyParser, function (req, res) {
     var id = req.params.id;
-    var purpose = req.params.purpose;
+    var purpose = "content";
     console.log("upload called " + id + " " + purpose);
 
     if (!neuralStyleUtil.validateId(id)) {

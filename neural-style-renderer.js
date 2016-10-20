@@ -7,19 +7,26 @@ var path = require('path');
 var childProcess = require('child_process');
 var neuralStyleUtil = require('./neural-style-utils');
 
-var NUM_PROGRESS_IMAGES = 10;
-var TOTAL_ITER_NUM = 100;
+var models = [
+    "models/instance_norm/candy.t7",
+    "models/eccv16/composition_vii.t7",
+    "models/instance_norm/feathers.t7",
+    "models/eccv16/la_muse.t7",
+    "models/instance_norm/mosaic.t7",
+    "models/eccv16/starry_night.t7",
+    "models/instance_norm/the_scream.t7",
+    "models/instance_norm/udnie.t7",
+    "models/eccv16/the_wave.t7"
+];
 
 function getTaskStatus(task) {
     console.log("getTaskStatus",task.id);
     var status = {
         'id': task.id,
         'contentUrl': neuralStyleUtil.imagePathToUrl(task.contentPath),
-        'styleUrl': neuralStyleUtil.imagePathToUrl(task.stylePath),
         'settings': task.settings,
         'state': task.state,
-        'iter': task.iter,
-        'totalIter': TOTAL_ITER_NUM
+        'modelId': task.modelId
     };
 
     var outputPath = neuralStyleUtil.getImagePathPrefix(task.id, neuralStyleUtil.OUTPUT);
@@ -28,6 +35,10 @@ function getTaskStatus(task) {
     }
 
     return status;
+}
+
+function getModelpathById(id){
+    return models[id-1];
 }
 
 function runRender(task, callback) {
@@ -41,18 +52,12 @@ function runRender(task, callback) {
 
     var outputPath = neuralStyleUtil.getImagePathPrefix(task.id, neuralStyleUtil.OUTPUT);
     var params = [
-        path.join(config.get('neuralStylePath'), 'neural_style.lua'),
-        '-content_image', task.contentPath,
-        '-style_image', task.stylePath,
-        '-gpu', task.settings.gpu,
-        '-num_iterations', task.settings.numIterations,
+        path.join(config.get('neuralStylePath'), 'fast_neural_style.lua'),
+        '-model',task.modelPath,
+        '-input_image', task.contentPath,
         '-output_image', outputPath + '.png',
-        '-print_iter', 10
+        '-gpu', task.settings.gpu
     ];
-
-    if (task.settings.normalizeGradients) {
-        params.push('-normalize_gradients');
-    }
 
     console.log('Running neural_style for id ' + task.id + ' with params: ' + params);
     var neuralStyle = childProcess.spawn('th', params, {
@@ -60,18 +65,18 @@ function runRender(task, callback) {
     });
 
 
-    function getLatestIteration(stdout) {
-        var iterRegex = /Iteration (\d+) \/ \d+/;
+    function getIsTaskCompleted(stdout) {
+        var iterRegex = /Writing output image to (.)+\.png/;
         var lines = stdout.split('\n');
         var i = lines.length - 1;
         while (i >= 0) {
             var match = iterRegex.exec(lines[i]);
-            if (match) {
-                return Number(match[1]);
+            if (match && match.length > 0) {
+                return true;
             }
             i--;
         }
-        return 0;
+        return false;
     }
 
     var stdout = '';
@@ -79,9 +84,9 @@ function runRender(task, callback) {
     neuralStyle.stdout.on('data', function(data) {
         console.log(String(data));
         stdout += String(data);
-        task.iter = getLatestIteration(stdout);
-        if (task.iter > lastIter) {
-            lastIter = task.iter;
+        var isTaskCompleted = getIsTaskCompleted(stdout);
+        if (isTaskCompleted) {
+            //task.state = neuralStyleUtil.DONE;
             sendTaskStatusEvent(task);
         }
 
@@ -109,9 +114,6 @@ var workqueue = [];
 var tasks = [];
 
 var DEFAULT_SETTINGS = {
-    'normalizeGradients': false,
-    'optimizer': 'adam',
-    'numIterations':TOTAL_ITER_NUM,
     'gpu':-1
 };
 
@@ -125,17 +127,14 @@ exports.enqueueJob = function(id, settings) {
         function(cb) {
             neuralStyleUtil.findImagePath(id, neuralStyleUtil.CONTENT, cb);
         },
-        function(cb) {
-            neuralStyleUtil.findImagePath(id, neuralStyleUtil.STYLE, cb);
-        },
     ], function(err, results) {
         var task = {
             'id': id,
             'state': neuralStyleUtil.QUEUED,
             'contentPath': results[1],
-            'stylePath': results[2],
             'settings': settings,
-            'iter': 0
+            'modelId': settings.modelId,
+            'modelPath': getModelpathById(settings.modelId)
         };
         tasks.unshift(task);
         if (err) {
@@ -167,10 +166,3 @@ exports.eventEmitter = new events.EventEmitter();
 function sendTaskStatusEvent(task) {
     exports.eventEmitter.emit('render', getTaskStatus(task));
 }
-
-/*function sendStatusEvent() {
-    exports.getStatus(function(status) {
-        exports.eventEmitter.emit('status', status);
-    });
-}
-setInterval(sendStatusEvent, 15000);*/
