@@ -53,7 +53,7 @@ function runRender(task, callback) {
     var outputPath = neuralStyleUtil.getImagePathPrefix(task.id, neuralStyleUtil.OUTPUT);
     var params = [
         path.join(config.get('neuralStylePath'), 'fast_neural_style.lua'),
-        '-model',task.modelPath,
+        '-model',path.join(config.get('neuralStylePath'),task.modelPath),
         '-input_image', task.contentPath,
         '-output_image', outputPath + '.png',
         '-gpu', task.settings.gpu
