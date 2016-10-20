@@ -37,8 +37,8 @@ function getTaskStatus(task) {
     return status;
 }
 
-function getModelpathById(id){
-    return models[id-1];
+function getModelPathById(id){
+    return path.join(config.get('neuralStylePath'),models[id-1]);
 }
 
 function runRender(task, callback) {
@@ -51,11 +51,10 @@ function runRender(task, callback) {
     sendTaskStatusEvent(task);
 
     var outputPath = neuralStyleUtil.getImagePathPrefix(task.id, neuralStyleUtil.OUTPUT);
-    var modelPath = path.join(config.get('neuralStylePath'),task.modelPath);
-    console.log("modelpath:",task.modelPath,modelPath);
+    console.log("outputPath",outputPath,task.modelPath);
     var params = [
         path.join(config.get('neuralStylePath'), 'fast_neural_style.lua'),
-        '-model',modelPath,
+        '-model',task.modelPath,
         '-input_image', task.contentPath,
         '-output_image', outputPath + '.png',
         '-gpu', task.settings.gpu
@@ -82,7 +81,6 @@ function runRender(task, callback) {
     }
 
     var stdout = '';
-    var lastIter = 0;
     neuralStyle.stdout.on('data', function(data) {
         console.log(String(data));
         stdout += String(data);
@@ -136,7 +134,7 @@ exports.enqueueJob = function(id, settings) {
             'contentPath': results[1],
             'settings': settings,
             'modelId': settings.modelId,
-            'modelPath': getModelpathById(settings.modelId)
+            'modelPath': getModelPathById(settings.modelId)
         };
         tasks.unshift(task);
         if (err) {
