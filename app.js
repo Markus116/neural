@@ -57,8 +57,8 @@ app.post('/render/:id',jsonBodyParser,function(req, res){
         res.status(400).send('invalid id');
         return;
     }
-    var settings = req.body;
-    console.log("settings", settings);
+    var settings = JSON.parse(req.body);
+    console.log("settings", settings,req.body);
     neuralStyleRenderer.enqueueJob(req.params.id, settings);
     res.end();
 });
