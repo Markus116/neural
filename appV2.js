@@ -26,16 +26,16 @@ var models = [
 
 var rawBodyParser = bodyParser.raw({limit: '10mb'});
 
-app.post("/render/:filterId", rawBodyParser, function (req, res) {
+app.post("/render/:filterId",rawBodyParser, function (req, res) {
     var filterId = req.params.filterId;
     console.log("save bitmap to file ");
-    if(req.body){
+    if(req.body!=null && req.body!=undefined){
         var fileData = {image:req.body, filterId:filterId, path:"",fileId:"", resultPath:""};
         async.waterfall([
             function(callback) {
                 saveBitmap(fileData,callback);
-            },
-            /*function(callback) {
+            }/*,
+            function(callback) {
                 renderFile(fileData,callback);
             },
             function(callback){
@@ -58,7 +58,7 @@ app.post("/render/:filterId", rawBodyParser, function (req, res) {
     return;
 }
 
-function readResultFile(fileData, callback){
+/*function readResultFile(fileData, callback){
 
 }
 
@@ -118,7 +118,7 @@ function renderFile(fileData, callback){
         }
     });
 
-}
+}*/
 
 // save bitmap to file and return file path
 function saveBitmap(fileData, callback){
