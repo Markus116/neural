@@ -34,6 +34,7 @@ app.post("/render/:filterId",rawBodyParser, function (req, res) {
         var fileData = {image:req.body, filterId:filterId, path:"",fileId:"", resultPath:""};
         async.waterfall([
             function(callback) {
+                console.log("save bitmap to file ");
                 saveBitmap(fileData,callback);
             }/*,
             function(callback) {
@@ -125,6 +126,7 @@ function renderFile(fileData, callback){
 function saveBitmap(fileData, callback){
     fileData.fileId = getUniqueId();
     fileData.path = config.get('dataPath') + fileData.fileId + ".jpg";
+    console.log("saveBitmap",fileData.fileId , fileData.path);
     fs.writeFile(fileData.path, fileData.image);
     callback(null,fileData);
 }
