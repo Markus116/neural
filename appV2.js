@@ -12,7 +12,7 @@ app.use(morgan('short'));
 app.use('/images',express.static('images'));
 app.use(cors());
 
-var models = [
+/*var models = [
     "models/instance_norm/candy.t7",
     "models/eccv16/composition_vii.t7",
     "models/instance_norm/feathers.t7",
@@ -22,9 +22,9 @@ var models = [
     "models/instance_norm/the_scream.t7",
     "models/instance_norm/udnie.t7",
     "models/eccv16/the_wave.t7"
-];
+];*/
 
-var rawBodyParser = bodyParser.raw({limit: '10mb'});
+/*var rawBodyParser = bodyParser.raw({limit: '10mb'});
 
 app.post("/render/:filterId",rawBodyParser, function (req, res) {
     var filterId = req.params.filterId;
@@ -34,13 +34,13 @@ app.post("/render/:filterId",rawBodyParser, function (req, res) {
         async.waterfall([
             function(callback) {
                 saveBitmap(fileData,callback);
-            }/*,
+            }/!*,
             function(callback) {
                 renderFile(fileData,callback);
             },
             function(callback){
                 readResultFile(fileData,callback);
-            }*/
+            }*!/
         ], function (error, success) {
             if (error) {
                 console.log('Something is wrong!');
@@ -56,7 +56,7 @@ app.post("/render/:filterId",rawBodyParser, function (req, res) {
 
     res.status(400).send('invalid image data');
     return;
-}
+}*/
 
 /*function readResultFile(fileData, callback){
 
@@ -121,7 +121,7 @@ function renderFile(fileData, callback){
 }*/
 
 // save bitmap to file and return file path
-function saveBitmap(fileData, callback){
+/*function saveBitmap(fileData, callback){
     fileData.fileId = getUniqueId();
     fileData.path = config.get('dataPath') + fileData.fileId + ".jpg";
     fs.writeFile(fileData.path, fileData.image);
@@ -146,7 +146,7 @@ try {
     if (ex.code != 'EEXIST') {
         throw ex;
     }
-}
+}*/
 
 
 var server = app.listen(config.get('port'), function () {
