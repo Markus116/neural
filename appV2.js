@@ -35,12 +35,12 @@ app.post("/render/:filterId", rawBodyParser, function (req, res) {
             function(callback) {
                 saveBitmap(fileData,callback);
             },
-            function(callback) {
+            /*function(callback) {
                 renderFile(fileData,callback);
             },
             function(callback){
                 readResultFile(fileData,callback);
-            }
+            }*/
         ], function (error, success) {
             if (error) {
                 console.log('Something is wrong!');
@@ -100,7 +100,9 @@ function renderFile(fileData, callback){
         var isTaskCompleted = getIsTaskCompleted(stdout);
         if (isTaskCompleted) {
             //task.state = neuralStyleUtil.DONE;
-            sendTaskStatusEvent(task);
+           // sendTaskStatusEvent(task);
+            neuralStyle.kill();
+            return
         }
 
         if (task.state == neuralStyleUtil.CANCELLED) {
