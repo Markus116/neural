@@ -106,29 +106,28 @@ function renderFile(fileData){
         });
 
         var stdout = '';
+        var isTaskCompleted = false;
         neuralStyle.stdout.on('data', function(stdata) {
             console.log(String(stdata));
             stdout += String(stdata);
-            var isTaskCompleted = getIsTaskCompleted(stdout);
+            isTaskCompleted = getIsTaskCompleted(stdout);
             if (isTaskCompleted) {
                 console.log("task completed");
                 neuralStyle.kill();
-                resolve(fileData);
+                //resolve(fileData);
             }
         });
 
         neuralStyle.on('exit', function(code) {
             console.log("task exited");
-            var isFailed = false;
+
+            if(isTaskCompleted){
+                resolve(fileData);
+                return;
+            }
             if (code != 0) {
                 console.log('neural_style failed for id with code ' + code + '\n' + neuralStyle.stderr.read());
-                isFailed = true;
-            }
-
-            if(isFailed){
                 reject("Error");
-            } else {
-                resolve(fileData);
             }
         });
     });
