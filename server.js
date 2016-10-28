@@ -121,7 +121,7 @@ function renderFile(fileData){
             console.log("task exited");
             var isFailed = false;
             if (code != 0) {
-                console.log('neural_style failed for id ' + task.id + ' with code ' + code + '\n' + neuralStyle.stderr.read());
+                console.log('neural_style failed for id with code ' + code + '\n' + neuralStyle.stderr.read());
                 isFailed = true;
             }
 
