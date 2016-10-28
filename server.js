@@ -100,6 +100,7 @@ function renderFile(fileData){
             '-gpu', -1
         ];
 
+
         var neuralStyle = childProcess.spawn('th', params, {
             'cwd': config.get('neuralStylePath'),
         });
