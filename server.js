@@ -71,8 +71,10 @@ function saveBase64ImageToFile(fileData) {
 
 function readResultFile(fileData) {
     return new Promise((resolve, reject) =>{
+        console.log("readResultFile");
         fs.readFile(fileData.resultPath, {encoding: 'base64'}, function(err, data) {
             if(err){
+                console.error("readResultFile error", err);
                 reject(err);
                 return;
             }
