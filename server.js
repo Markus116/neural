@@ -115,7 +115,7 @@ function renderFile(fileData){
             isTaskCompleted = getIsTaskCompleted(stdout);
             if (isTaskCompleted) {
                 console.log("task completed");
-                neuralStyle.kill();
+                //neuralStyle.kill();
                 //resolve(fileData);
             }
         });
