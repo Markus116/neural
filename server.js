@@ -99,7 +99,8 @@ function renderFile(fileData){
             '-model',getModelPath(fileData.filterId),
             '-input_image', fileData.path,
             '-output_image', fileData.resultPath,
-            '-gpu', -1
+            '-gpu', -1,
+			'-image_size', 0
         ];
 
 
