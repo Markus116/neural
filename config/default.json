@@ -1,7 +1,7 @@
 {
   "port": 3030,
-  "dataPath": "/home/trembit/neural/images/",
-  "neuralStylePath": "/home/trembit/fast-neural-style/",
+  "dataPath": "/home/ubuntu/neural/images/",
+  "neuralStylePath": "/home/ubuntu/fast-neural-style/",
   "username": "user",
   "password": "password"
 }
