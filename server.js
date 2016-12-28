@@ -63,7 +63,7 @@ app.post("/render", jsonBodyParser, function (req, res) {
 function saveBase64ImageToFile(fileData) {
     return new Promise((resolve, reject) => {
         console.log("saveImageVVV");
-        var imageBase = fileData.image.split("/base64,/")[1];
+        var imageBase = fileData.image.split(",")[1];
         var ImageBuffer = new Buffer(imageBase, 'base64'); // decode
         fs.writeFile(getFilePath(fileData.fileId,false), ImageBuffer, err => {
             if (err) {
