@@ -94,15 +94,9 @@ function readResultFile(fileData) {
                 reject(err);
                 return;
             }
-            fileData.resultImage = data;
-            console.log("resultImage part", fileData.resultImage.substring(0,30));
-            console.log(fileData);
+            fileData.resultImage = "data:image/png;base64," + data;
             resolve(fileData);
         });
-        /*// read binary data
-         var bitmap = fs.readFileSync(file);
-         // convert binary data to base64 encoded string
-         return new Buffer(bitmap).toString('base64');*/
     });
 }
 
