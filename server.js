@@ -12,7 +12,7 @@ var Buffer = require('buffer').Buffer;
 
 var app = express();
 app.use(morgan('short'));
-app.use('/images',express.static('images'));
+app.use('/images', express.static('images'));
 app.use(cors());
 
 var models = [
@@ -27,26 +27,31 @@ var models = [
     "models/eccv16/the_wave.t7"
 ];
 
-var rawBodyParser = bodyParser.raw({limit: '10mb'});
 var jsonBodyParser = bodyParser.json({limit: '10mb'});
 
-app.post("/render",jsonBodyParser, function (req, res) {
+app.post("/render", jsonBodyParser, function (req, res) {
     var fileId = getUniqueId();
-    console.log("save bitmap to file ",fileId);
-    if(req.body){
-        var fileData = {image:req.body.image, path:"", filterId:req.body.filterId,fileId:fileId, resultPath:"", resultImage:null};
-        fileData.path = path.join(config.get('dataPath'),fileData.fileId+".png");
-        fileData.resultPath = path.join(config.get('dataPath'),fileData.fileId+"_res.png");
+    console.log("save bitmap to file ", fileId);
+    if (req.body) {
+        var fileData = {
+            image: req.body.image,
+            filterId: req.body.filterId,
+            fileId: fileId,
+            resultImage: null
+        };
+
+        /*fileData.path = path.join(config.get('dataPath'), fileData.fileId + ".png");
+        fileData.resultPath = path.join(config.get('dataPath'), fileData.fileId + "_res.png");*/
 
         saveBase64ImageToFile(fileData)
             .then(renderFile)
             .then(readResultFile)
-            .then(function (fileData){
+            .then(function (fileData) {
                 console.log("DONE");
-                res.send({image:fileData.resultImage});
+                res.send({image: fileData.resultImage, path: getRelativeFilePath(fileData.fileId,true)});
                 return;
             })
-            .catch(function (err){
+            .catch(function (err) {
                 console.error(err);
                 res.status(400).send('invalid image data');
             });
@@ -58,8 +63,9 @@ app.post("/render",jsonBodyParser, function (req, res) {
 function saveBase64ImageToFile(fileData) {
     return new Promise((resolve, reject) => {
         console.log("saveImageVVV");
-        var ImageBuffer = new Buffer(fileData.image, 'base64'); // decode
-        fs.writeFile(fileData.path, ImageBuffer, err => {
+        var imageBase = fileData.image.split("/base64,/")[1];
+        var ImageBuffer = new Buffer(imageBase, 'base64'); // decode
+        fs.writeFile(getFilePath(fileData.fileId,false), ImageBuffer, err => {
             if (err) {
                 reject(err);
                 return;
@@ -69,38 +75,46 @@ function saveBase64ImageToFile(fileData) {
     });
 }
 
+function getFilePath(fileId, isRes) {
+    var pref = (isRes == true ? "_res" : "");
+    return path.join(config.get('dataPath'), fileId + pref + ".png")
+}
+
+function getRelativeFilePath(fileId, isRes) {
+    var pref = (isRes == true ? "_res" : "");
+    return '/images/'+ fileId + pref + ".png";
+}
+
 function readResultFile(fileData) {
-    return new Promise((resolve, reject) =>{
+    return new Promise((resolve, reject) => {
         console.log("readResultFile");
-        fs.readFile(fileData.resultPath, {encoding: 'base64'}, function(err, data) {
-            if(err){
+        fs.readFile(getFilePath(fileData.fileId,true), {encoding: 'base64'}, function (err, data) {
+            if (err) {
                 console.error("readResultFile error", err);
                 reject(err);
                 return;
             }
             fileData.resultImage = data;
+            console.log("resultImage part", fileData.resultImage.substring(0,30));
+            console.log(fileData);
             resolve(fileData);
         });
         /*// read binary data
-        var bitmap = fs.readFileSync(file);
-        // convert binary data to base64 encoded string
-        return new Buffer(bitmap).toString('base64');*/
+         var bitmap = fs.readFileSync(file);
+         // convert binary data to base64 encoded string
+         return new Buffer(bitmap).toString('base64');*/
     });
 }
 
-function renderFile(fileData){
-    return new Promise ((resolve, reject) => {
-        /*fileData.resultPath = path.join(config.get('dataPath'),'4406471310649067_res.png');
-        resolve(fileData);
-        return;*/
-        console.log("renderFile2 outputPath",fileData.resultPath);
+function renderFile(fileData) {
+    return new Promise((resolve, reject) => {
+        console.log("renderFile2 outputPath", getFilePath(fileData.fileId,true));
         var params = [
             path.join(config.get('neuralStylePath'), 'fast_neural_style.lua'),
-            '-model',getModelPath(fileData.filterId),
-            '-input_image', fileData.path,
-            '-output_image', fileData.resultPath,
-            '-gpu', -1,
-			'-image_size', 0
+            '-model', getModelPath(fileData.filterId),
+            '-input_image', getFilePath(fileData.fileId,false),
+            '-output_image', getFilePath(fileData.fileId,true),
+            '-gpu', -1
         ];
 
 
@@ -110,7 +124,7 @@ function renderFile(fileData){
 
         var stdout = '';
         var isTaskCompleted = false;
-        neuralStyle.stdout.on('data', function(stdata) {
+        neuralStyle.stdout.on('data', function (stdata) {
             console.log(String(stdata));
             stdout += String(stdata);
             isTaskCompleted = getIsTaskCompleted(stdout);
@@ -121,10 +135,10 @@ function renderFile(fileData){
             }
         });
 
-        neuralStyle.on('exit', function(code) {
+        neuralStyle.on('exit', function (code) {
             console.log("task exited");
 
-            if(isTaskCompleted){
+            if (isTaskCompleted) {
                 resolve(fileData);
                 return;
             }
@@ -136,15 +150,15 @@ function renderFile(fileData){
     });
 }
 
-function getModelPath(id){
+function getModelPath(id) {
     var modelId = Number(id);
-    var modelPath = models[modelId-1];
+    var modelPath = models[modelId - 1];
     console.log("modelId = " + id + " " + modelId, modelPath);
     return path.join(config.get('neuralStylePath'), modelPath);
 }
 
-function getUniqueId (){
-    return Math.round(Math.random()*Math.pow(10,16));
+function getUniqueId() {
+    return Math.round(Math.random() * Math.pow(10, 16));
 }
 
 function getIsTaskCompleted(stdout) {
