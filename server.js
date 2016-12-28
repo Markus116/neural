@@ -15,6 +15,19 @@ app.use(morgan('short'));
 app.use('/images', express.static('images'));
 app.use(cors());
 
+var allowCrossDomain = function(req, res, next) {
+    if ('OPTIONS' == req.method) {
+        res.header('Access-Control-Allow-Origin', '*');
+        res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,PATCH,OPTIONS');
+        res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, Content-Length, X-Requested-With');
+        res.send(200);
+    }else {
+        next();
+    }
+};
+
+app.use(allowCrossDomain);
+
 var models = [
     "models/instance_norm/candy.t7",
     "models/eccv16/composition_vii.t7",
@@ -48,6 +61,7 @@ app.post("/render", jsonBodyParser, function (req, res) {
             .then(readResultFile)
             .then(function (fileData) {
                 console.log("DONE");
+                res.header("Access-Control-Allow-Origin","*");
                 res.send({image: fileData.resultImage, path: getRelativeFilePath(fileData.fileId,true)});
                 return;
             })
