@@ -122,7 +122,7 @@ function renderFile(fileData) {
             '-model', getModelPath(fileData.filterId),
             '-input_image', getFilePath(fileData.fileId,false),
             '-output_image', getFilePath(fileData.fileId,true),
-            '-gpu', -1,
+            '-gpu', 0,
             '-image_size', 0
         ];
 
