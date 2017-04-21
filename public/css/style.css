@@ -1,0 +1,45 @@
+.logo {
+  max-width: 48px;
+  height: auto; }
+
+.filter-list {
+  overflow-x: hidden;
+  overflow-y: scroll; }
+  .filter-list md-list-item {
+    margin-bottom: 5px; }
+  .filter-list button:disabled {
+    background-color: rgba(255, 255, 255, 0.5); }
+    .filter-list button:disabled + .md-list-item-inner > .filter-label {
+      opacity: 0.5;
+      cursor: default; }
+
+.filter-img {
+  max-width: 100%; }
+
+.filter-label {
+  position: absolute;
+  bottom: 0;
+  left: 16px;
+  right: 16px;
+  padding: 0 5px;
+  color: #fff;
+  text-align: center;
+  background-color: rgba(0, 0, 0, 0.5);
+  overflow: hidden; }
+
+.user-image {
+  max-width: 99%;
+  max-height: 99%; }
+
+.full-screen-overlay {
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 10999;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(255, 255, 255, 0.7); }
+
+/*# sourceMappingURL=style.css.map */

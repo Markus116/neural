@@ -12,6 +12,7 @@ var Buffer = require('buffer').Buffer;
 
 var app = express();
 app.use(morgan('short'));
+app.use('/', express.static('public'));
 app.use('/images', express.static('images'));
 app.use(cors());
 

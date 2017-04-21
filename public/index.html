@@ -1,15 +1,92 @@
-<!doctype html>
-<html>
+<!DOCTYPE html>
+<html lang="en">
 <head>
-  <title>Neural Style Server</title>
-
-  <link rel="stylesheet" href="main.css">
-
-  <script src="bower_components/webcomponentsjs/webcomponents-lite.js"></script>
-
-  <link rel="import" href="main-page.html">
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Prizma Demo</title>
+    <link rel="stylesheet" href="libs/angular-material/angular-material.min.css"/>
+    <link rel="stylesheet" href="css/style.css"/>
 </head>
-<body>
-  <main-page></main-page>
+<body ng-app="PrizmaDemo" layout="row" flex ng-controller="ApplicationController" ng-cloak="true">
+<!--LEFT SIDENAV-->
+<md-sidenav md-is-locked-open="$mdMedia('gt-sm')" layout="column" class="md-sidenav-left md-whiteframe-4dp" md-component-id="left">
+    <!--Sidenav toolbar-->
+    <md-toolbar>
+        <div class="md-toolbar-tools">
+            <span flex></span>
+            <md-button class="md-icon-button" aria-label="Settings" ng-click="toggleSidenav()" hide-gt-sm>
+                <md-icon md-svg-icon="menu"></md-icon>
+            </md-button>
+        </div>
+    </md-toolbar>
+    <!--Sidenav content-->
+    <md-content flex layout="column" layout-align="center center">
+        <!-- UPLOAD IMAGE -->
+        <upload>
+            <input id="file-input" type="file" class="ng-hide">
+            <md-button id="upload-button" class="md-raised md-accent" aria-label="upload image">Upload Image</md-button>
+        </upload>
+        <!-- CHOOSE FILTER -->
+        <md-list flex class="filter-list">
+            <md-subheader class="md-no-sticky">Choose a filter:</md-subheader>
+            <md-list-item ng-repeat="filter in filters" ng-click="selectFilter(filter.id)" ng-disabled="!srcOriginal">
+                <img class="filter-img" ng-src="{{filter.src}}" />
+                <div class="filter-label">{{filter.name}}</div>
+            </md-list-item>
+        </md-list>
+        <div layout="row" class="flex-no-shrink" layout-align="center">
+            <!-- APPLY FILTER -->
+            <md-button id="apply-button" class="md-raised md-accent" aria-label="apply filter" ng-click="applyFilter()" ng-disabled="!(srcOriginal && filter)">Apply Filter</md-button>
+            <!-- SAVE IMAGE -->
+            <md-button class="md-fab md-mini md-primary" aria-label="Download" ng-click="downloadImage(srcLink)" ng-disabled="!srcProcessed">
+                <md-icon md-svg-icon="download"></md-icon>
+            </md-button>
+        </div>
+    </md-content>
+</md-sidenav>
+<!--FULL SCREEN-->
+<md-content flex layout="column">
+    <!--Full screen toolbar-->
+    <md-toolbar>
+        <div class="md-toolbar-tools">
+            <md-button class="md-icon-button" aria-label="Settings" ng-click="toggleSidenav()" hide-gt-sm>
+                <md-icon md-svg-icon="menu"></md-icon>
+            </md-button>
+            <span flex></span>
+            <img src="img/logo.png" class="logo" alt="Logo">
+            <span flex></span>
+            <md-button class="md-icon-button" ng-click="null" style="opacity:0;">
+                <md-icon md-svg-icon="menu"></md-icon>
+            </md-button>
+        </div>
+    </md-toolbar>
+    <!-- Full screen space-->
+    <md-content flex layout="row" layout-align="center center">
+        <!-- RESULT -->
+        <img ng-src="{{srcProcessed || srcOriginal}}" class="user-image" id="user-image">
+    </md-content>
+</md-content>
+<!-- FULL SCREEN OVERLAY: Loading -->
+<div class="full-screen-overlay" layout="column" layout-align="space-around" ng-show="isInProgress">
+    <div layout="row" layout-align="space-around">
+        <md-progress-circular class="md-accent" md-mode="indeterminate" md-diameter="120" ng-disabled="!isInProgress"></md-progress-circular>
+    </div>
+</div>
+
+<script src="libs/jquery/dist/jquery.js"></script>
+
+<script src="libs/angular/angular.js"></script>
+<script src="libs/angular-animate/angular-animate.js"></script>
+<script src="libs/angular-aria/angular-aria.js"></script>
+<script src="libs/angular-material/angular-material.js"></script>
+<script src="libs/angular-messages/angular-messages.js"></script>
+
+<script src="js/application.module.js"></script>
+<script src="js/application.config.js"></script>
+<script src="js/application.controller.js"></script>
+<script src="js/application.service.js"></script>
+
+<script src="js/upload.directive.js"></script>
 </body>
 </html>
