@@ -38,7 +38,14 @@ var models = [
     "models/instance_norm/the_scream.t7",
     "models/instance_norm/udnie.t7",
     "models/eccv16/the_wave.t7",
-    "models/eccv16/blue.t7"
+    "models/eccv16/blue.t7",
+    "models/eccv16/warhol.t7",
+    "models/eccv16/watercolor_Jolie.t7",
+    "models/eccv16/vangogh.t7",
+    "models/eccv16/the_bedroom_arles.t7",
+    "models/eccv16/tintin.t7",
+    "models/eccv16/nijntje.t7",
+
 ];
 
 var jsonBodyParser = bodyParser.json({limit: '10mb'});

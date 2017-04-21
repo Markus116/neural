@@ -1,5 +1,5 @@
 {
-  "port": 3030,
+  "port": 8080,
   "dataPath": "/home/ubuntu/neural/images/",
   "neuralStylePath": "/home/ubuntu/fast-neural-style/",
   "username": "user",
