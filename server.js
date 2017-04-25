@@ -46,7 +46,7 @@ var models = [
     "models/eccv16/the_bedroom_arles.t7",
     "models/eccv16/tintin.t7",
     "models/eccv16/nijntje.t7",
-
+    "models/instance_norm/night_fantasy.t7",
 ];
 
 var jsonBodyParser = bodyParser.json({limit: '10mb'});

@@ -29,6 +29,7 @@
             {name:"Bedroom at Arles", src: 'img/filters/the_bedroom_at_arles.jpg', id:14},
             {name:"Tintin", src: 'img/filters/tintin.jpg', id:15},
             {name:"Nijntje", src: 'img/filters/nijntje.jpg', id:16},
+            {name:"Night Fantasy", src: 'img/filters/night_fantasy.jpg', id:17},
         ];
         $scope.isInProgress = false;
         $scope.srcLink = null; // Link to image on server
